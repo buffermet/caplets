@@ -71,6 +71,10 @@ set hstshijack.replacements  google.corn,*.google.corn
 
 You can try to make them as unnoticeable as you can, but your options are limited here in terms of evading HSTS.
 
+### Regular Expression replacements
+
+...
+
 ### Block scripts
 
 In the <a href="./hstshijack.cap">**caplet file**</a> you can block JavaScript from hosts by assigning them to the `hstshijack.blockscripts` variable. _(wildcard allowed)_ 
@@ -79,7 +83,7 @@ In the <a href="./hstshijack.cap">**caplet file**</a> you can block JavaScript f
 
 You can also inject your own scripts into files from your specified hosts by assigning them to the `hstshijack.payloads` variable.
 
-Custom payloads are (optionally) obfuscated at launch, executed synchronously, and wrapped inside a function that is defined as a property of the current JavaScript context (globalThis). This is done to ensure that your payload is only executed once per application, even if injected multiple times. Individual payloads are not failsafe, so you must set your conditions/try and catch blocks yourself.
+Custom payloads are (optionally) obfuscated at launch, executed synchronously, and wrapped inside a function that is defined as a property of the current JavaScript context (globalThis). This is done to ensure that your payload is only executed once per application, even if injected multiple times.
 
 Example:
 
