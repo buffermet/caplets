@@ -30,7 +30,7 @@ set hstshijack.ignore                     captive.apple.com,connectivitycheck.gs
 
 net.recon on
 
-set http.proxy.script  /usr/local/share/bettercap/caplets/hstshijack/modules/hstshijack.js
+set http.proxy.script  /usr/local/share/bettercap/caplets/hstshijack/modules/http.proxy.js
 http.proxy on
 
 set dns.proxy.script /usr/local/share/bettercap/caplets/hstshijack/modules/dns.proxy.js
