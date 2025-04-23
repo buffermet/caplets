@@ -13,6 +13,7 @@ set hstshijack.targets                    *.com, *.net,*.me, *.nl,*.ai,*.co.uk,*
 set hstshijack.replacements               *.corn,*.nel,*.rne,*.ni,*.al,*.cc.uk,*.ch,*.googl
 set hstshijack.replacements.req.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/req.body.json
 set hstshijack.replacements.req.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/req.headers.json
+set hstshijack.replacements.req.url       /usr/local/share/bettercap/caplets/hstshijack/replacements/req.url.json
 set hstshijack.replacements.res.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/res.body.json
 set hstshijack.replacements.res.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/res.headers.json
 set hstshijack.ssl.domains                /usr/local/share/bettercap/caplets/hstshijack/ssl/domains.txt
