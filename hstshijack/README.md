@@ -53,7 +53,7 @@ Injecting <a href="./payloads/hijack.js">**hijack.js**</a> is essential for host
 
 When hosts respond with an HTTPS redirect, bettercap will save their hostname in lists that are sorted by domain prefixes, allowing the list to scale by reducing a considerable amount of overhead for the proxy module.
 
-By default, this caplet will remap these lists of domains that were found in the file that you assigned to the `hstshijack.ssl.domains` variable on launch (to ensure that it is still in the right format). You can skip this by setting the `hstshijack.ssl.check` variable to `false`.
+By default, this caplet will remap these lists of domains that were found in the file that you assigned to the `hstshijack.ssl.domains` variable on launch (to ensure that it is still in the right format). You can skip this by setting the `hstshijack.ssl.index.check` variable to `false`.
 
 Bettercap will also send a HEAD request to unknown hosts that were discovered in the injected document and retrieved via a callback from the <a href="./payloads/hijack.js">**hijack.js**</a> payload. This is done to learn what hosts use HTTPS, ahead of time.
 
