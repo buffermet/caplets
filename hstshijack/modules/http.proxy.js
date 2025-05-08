@@ -463,13 +463,13 @@ function indexDomain(domain) {
 function configure() {
   /* Read caplet. */
   env["hstshijack.ignore"]
-    ? ignore_hosts = env["hstshijack.ignore"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
+    ? ignore_hosts = env["hstshijack.ignore"].replace(/\s/g, "$1").split(",")
     : ignore_hosts = [];
   env["hstshijack.targets"]
-    ? target_hosts = env["hstshijack.targets"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
+    ? target_hosts = env["hstshijack.targets"].replace(/\s/g, "$1").split(",")
     : target_hosts = [];
   env["hstshijack.replacements"]
-    ? replacement_hosts = env["hstshijack.replacements"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
+    ? replacement_hosts = env["hstshijack.replacements"].replace(/\s/g, "$1").split(",")
     : replacement_hosts = [];
   env["hstshijack.blockscripts"]
     ? block_script_hosts = env["hstshijack.blockscripts"].replace(/^\s*(.*?)\s*$/g, "$1").split(",")
@@ -1565,4 +1565,3 @@ function onResponse(req, res) {
     res.SetHeader("Pragma", "no-cache");
   }
 }
-
