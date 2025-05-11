@@ -1,6 +1,6 @@
 var addr = env("iface.ipv4");
 
-var target_hosts = [];
+var hostnames = [];
 
 var Rrtype = {
 	None:  0,
@@ -14,14 +14,15 @@ String.prototype.endsWith = function(suffix) {
 };
 
 String.prototype.isTargeted = function() {
-	for (a = 0; a < target_hosts.length; a++) {
-		var target_host = target_hosts[a];
-		if (target_host[0] === "*") {
-			if (this.endsWith(target_host.slice(1)) + ".") return true;
-			if (this.endsWith(target_host.slice(1))) return true;
+	var target = this.toLowerCase();
+	for (a = 0; a < hostnames.length; a++) {
+		var hostname = hostnames[a];
+		if (hostname[0] === "*") {
+			if (target.endsWith(hostname.slice(1) + ".")) return true;
+			if (target.endsWith(hostname.slice(1))) return true;
 		} else {
-			if (this === target_host + ".") return true;
-			if (this === target_host) return true;
+			if (target === hostname + ".") return true;
+			if (target === hostname) return true;
 		}
 	}
 	return false;
@@ -57,5 +58,6 @@ function onRequest(req, res) {
 }
 
 function onLoad() {
-	target_hosts = env["hstshijack.targets"].replace(/\s/g, "").split(",");
+	hostnames = env["hstshijack.replacements"].replace(/\s/g, "").toLowerCase().split(",");
 }
+
