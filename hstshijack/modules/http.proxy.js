@@ -216,7 +216,7 @@ function parseCookie(cookie_string) {
 function randomString(length) {
 	length = parseInt(length);
 	var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-			buff  = new Array(length);
+		buff  = new Array(length);
 	for (var a = 0; a < buff.length; a++) {
 		index = parseInt(Math.random() * chars.length);
 		buff[a] = chars.charAt(index);
