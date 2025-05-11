@@ -6,7 +6,7 @@ var Rrtype = {
 	None:  0,
 	A:     1,
 //	CNAME: 5,
-//	AAAA:  28,
+	AAAA:  28,
 };
 
 String.prototype.endsWith = function(suffix) {
@@ -30,6 +30,7 @@ String.prototype.isTargeted = function() {
 };
 
 function onRequest(req, res) {
+	// Respond to A queries
 	req.Questions.forEach(function(question) {
 		if (question.Qtype === Rrtype.A) {
 			if (question.Name.isTargeted()) {
@@ -46,13 +47,15 @@ function onRequest(req, res) {
 				});
 			}
 		}
-		// Respond with AAAA records if necessary
 	});
-
+	// Drop AAAA queries
+	req.Questions = req.Questions.filter(function(question) {
+		if (question.Qtype === Rrtype.AAAA) return false;
+		return true;
+	});
 	if (res.Header.Response === true && res.Answers.length === 0) {
 		res.Header.Rrtype = Rrtype.None;
-
-		// Silence DNS errors by clearing all records
+		// Silence DNS errors
 		res.Extras = [];
 		res.Nameserver = [];
 	}
