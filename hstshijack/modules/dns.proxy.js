@@ -18,8 +18,9 @@ String.prototype.isTargeted = function() {
 	for (a = 0; a < hostnames.length; a++) {
 		var hostname = hostnames[a];
 		if (hostname[0] === "*") {
-			if (target.endsWith(hostname.slice(1) + ".")) return true;
-			if (target.endsWith(hostname.slice(1))) return true;
+			var suffix = hostname.slice(1);
+			if (target.endsWith(suffix + ".")) return true;
+			if (target.endsWith(suffix)) return true;
 		} else {
 			if (target === hostname + ".") return true;
 			if (target === hostname) return true;
