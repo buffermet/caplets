@@ -50,8 +50,7 @@ function onRequest(req, res) {
 	});
 	// Drop AAAA queries
 	req.Questions = req.Questions.filter(function(question) {
-		if (question.Qtype === Rrtype.AAAA) return false;
-		return true;
+		return question.Qtype !== Rrtype.AAAA;
 	});
 	if (res.Header.Response === true && res.Answers.length === 0) {
 		res.Header.Rrtype = Rrtype.None;
