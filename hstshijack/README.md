@@ -11,11 +11,11 @@
 # variables get precendence over those assigned to the 'hstshijack.ignore' variable.
 set hstshijack.targets                    *.com, *.net,*.me, *.nl,*.ai,*.co.uk,*.cn,*.google
 set hstshijack.replacements               *.corn,*.nel,*.rne,*.ni,*.al,*.cc.uk,*.ch,*.googl
-set hstshijack.replacements.req.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/req.body.json
-set hstshijack.replacements.req.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/req.headers.json
-set hstshijack.replacements.req.url       /usr/local/share/bettercap/caplets/hstshijack/replacements/req.url.json
-set hstshijack.replacements.res.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/res.body.json
-set hstshijack.replacements.res.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/res.headers.json
+set hstshijack.replacements.req.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/req.Body.json
+set hstshijack.replacements.req.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/req.Headers.json
+set hstshijack.replacements.req.url       /usr/local/share/bettercap/caplets/hstshijack/replacements/req.URL.json
+set hstshijack.replacements.res.body      /usr/local/share/bettercap/caplets/hstshijack/replacements/res.Body.json
+set hstshijack.replacements.res.headers   /usr/local/share/bettercap/caplets/hstshijack/replacements/res.Headers.json
 set hstshijack.ssl.domains                /usr/local/share/bettercap/caplets/hstshijack/ssl/domains.txt
 set hstshijack.ssl.index                  /usr/local/share/bettercap/caplets/hstshijack/ssl/index.json
 set hstshijack.ssl.index.check            true
