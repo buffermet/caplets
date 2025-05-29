@@ -123,8 +123,6 @@ Example:
 set hstshijack.payloads *:/usr/local/share/bettercap/caplets/hstshijack/payloads/hijack.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/sslstrip.js,*:/usr/local/share/bettercap/caplets/hstshijack/payloads/keylogger.js
 ```
 
-You should always inject the <a href="./payloads/hijack.js">**hijack.js**</a> payload when spoofing hostnames.
-
 ### Obfuscation
 
 You can write custom payloads that are automatically obfuscated by the module.
